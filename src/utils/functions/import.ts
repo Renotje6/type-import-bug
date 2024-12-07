@@ -7,12 +7,9 @@ import { join } from '@std/path';
  */
 export async function importer(globPath: string) {
 	if (Deno.args.includes('--is_compiled_binary')) {
-		// Import the manifest file and import all files listed in it
-		const { default: manifest } = await import(import.meta.resolve('../../../manifest.json'));
-
-		for (const module of manifest.modules) {
-			for await (const commandFiles of Deno.readDir(`${join(import.meta.dirname!, '../../../')}${module}`)) {
-				await import(import.meta.resolve(`file:///${join(import.meta.dirname!, '../../../')}${module}\\${commandFiles.name}`));
+		for await (const file of Deno.readDir(join(import.meta.dirname!, '../../../src/modules/core'))) {
+			if (file.isFile) {
+				await import(`file://${join(import.meta.dirname!, '../../../src/modules/core')}/${file.name}`);
 			}
 		}
 	} else {
